@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import {format, parse, compareAsc} from 'date-fns/esm'
+import {format, parse, compareAsc, isValid} from 'date-fns/esm'
   export default {
     name: 'vue-good-table',
     props: {
@@ -156,7 +156,6 @@ import {format, parse, compareAsc} from 'date-fns/esm'
       rowsPerPageText: {default: 'Rows per page:'},
       ofText: {default: 'of'},
       allText: {default: 'All'},
-      filterPlaceholderText: {default: 'Filter '}
     },
 
     data: () => ({
@@ -388,7 +387,7 @@ import {format, parse, compareAsc} from 'date-fns/esm'
 
       //get column's defined placeholder or default one
       getPlaceholder(column) {
-        const placeholder = column.placeholder || this.filterPlaceholderText + column.label
+        const placeholder = column.placeholder || 'Filter ' + column.label
         return placeholder
       },
 
@@ -530,6 +529,12 @@ import {format, parse, compareAsc} from 'date-fns/esm'
 
             // date comparison here
             if (this.columns[this.sortColumn].type === 'date') {
+              if (!isValid(x)) {
+                return -1 * (this.sortType === 'desc' ? -1 : 1);
+              }
+              if (!isValid(y)) {
+                return (this.sortType === 'desc' ? -1 : 1);
+              }
               return (compareAsc(x, y)) * (this.sortType === 'desc' ? -1 : 1);
             }
 
